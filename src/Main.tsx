@@ -76,9 +76,6 @@ const Main: React.FC<MainProps> = props => {
               </CenteredButton>
             );
           })}
-          <CenteredButton>
-            California Polytechnic State University: San Luis Obispo
-          </CenteredButton>
         </BookmarkBox>
         <EduContainer>
           {eduList.map((x: EduProps) => {

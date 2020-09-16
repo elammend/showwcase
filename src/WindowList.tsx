@@ -8,12 +8,24 @@ type ListProps = {
 type WLProps = {
   names: string[];
   length: number;
+  setSchool: (newName: string) => void;
+  setListDisplay: (display: string) => void;
 };
 
-const WindowList: FC<WLProps> = ({ names, length }) => {
+const WindowList: FC<WLProps> = ({
+  names,
+  length,
+  setSchool,
+  setListDisplay
+}) => {
   const Row: FC<ListProps> = ({ index, style }) => (
     <div
-      className={index % 2 ? "ListItemOdd" : "ListItemEven"}
+      className="WindowRow"
+      onClick={() => {
+        console.log("clicked here");
+        setSchool(names[index]);
+        setListDisplay("none");
+      }}
       style={{
         ...style,
         ...{
@@ -28,7 +40,13 @@ const WindowList: FC<WLProps> = ({ names, length }) => {
     </div>
   );
   return (
-    <List height={150} itemCount={length} itemSize={35} width="100%">
+    <List
+      className="SuggestionWindow"
+      height={150}
+      itemCount={length}
+      itemSize={35}
+      width="100%"
+    >
       {Row}
     </List>
   );

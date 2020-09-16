@@ -22,8 +22,21 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
   const [schoolSuggestions, setSchoolSuggestions] = useState([]);
   const [suggestionsLength, setSuggestionsLength] = useState(0);
   const [listDisplay, setListDisplay] = useState("none");
-  const [grade, setGrade] = useState("none");
+  const [grade, setGrade] = useState("");
 
+  const resetStates = (): void => {
+    setEndDateDisabled(false);
+    setSchool("");
+    setStartDate("");
+    setEndDate("");
+    setDegree("");
+    setStudy("");
+    setDescription("");
+    setSchoolSuggestions([]);
+    setSuggestionsLength(0);
+    setListDisplay("none");
+    setGrade("");
+  };
   useEffect(() => {
     const getSuggestions = async () => {
       const schoolSuggestions = await getSchoolSuggestions(school);
@@ -70,7 +83,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
     console.log("in here because you just changed suggestions");
     console.log(school);
 
-    if (schoolSuggestions.length == 0) {
+    if (
+      schoolSuggestions.length == 0 ||
+      (suggestionsLength == 1 && school == schoolSuggestions[0])
+    ) {
       console.log("schoolSuggestions length is 0", schoolSuggestions.length);
       setListDisplay("none");
     } else {
@@ -120,6 +136,7 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
     });
     setEdu(updatedList);
     //reset modal here
+    resetStates();
     setIsOpen(false);
   };
   const toggleEndDate = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -167,7 +184,20 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
     console.log("just set");
   };
   return (
-    <div>
+    <div
+      onClick={e => {
+        if (
+          (e.target as HTMLTextAreaElement).className != "SuggestionWindow" &&
+          (e.target as HTMLTextAreaElement).className != "WindowRow" &&
+          (e.target as HTMLTextAreaElement).id != "schoolInput"
+        ) {
+          console.log("should close suggestion window");
+          if (listDisplay == "block") {
+            setListDisplay("none");
+          }
+        }
+      }}
+    >
       <CenteredButton onClick={openModal}>Add new education</CenteredButton>
       <Modal
         ariaHideApp={false}
@@ -179,22 +209,20 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
         <div style={{ fontFamily: "Arial" }}>
           <h3>Add education</h3>
           {/* //////////////////////////////////////// SCHOOL DIV */}
-          <div id="schoolDiv">
+          <div
+            onFocus={() => {
+              console.log("focused!");
+              if (suggestionsLength != 0) {
+                setListDisplay("block");
+              }
+            }}
+          >
             <div style={{ display: "flex" }}>
               <div>School</div>
               <div style={{ color: "red" }}>*</div>
             </div>
             <Input
-              onFocus={() => {
-                console.log("focused!");
-                if (suggestionsLength != 0) {
-                  setListDisplay("block");
-                }
-              }}
-              onBlur={() => {
-                console.log("not focused!");
-                setListDisplay("none");
-              }}
+              id="schoolInput"
               value={school}
               onChange={e => onTextChange(e, "school")}
               placeholder={"Ex: Boston University"}
@@ -214,6 +242,8 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
               }}
             >
               <WindowList
+                setListDisplay={setListDisplay}
+                setSchool={setSchool}
                 names={schoolSuggestions}
                 length={suggestionsLength}
               ></WindowList>
