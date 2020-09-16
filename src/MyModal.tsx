@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { RightButton, Input, InputBox, CenteredButton } from "./MainStyles";
-
+import { getSchoolSuggestions } from "./api/api";
+import WindowList from "./WindowList";
 type EntryProps = {
   label: string;
   required: boolean;
@@ -21,6 +22,57 @@ const MyModal = () => {
   const [degree, setDegree] = useState("");
   const [study, setStudy] = useState("");
   const [description, setDescription] = useState("");
+  const [schoolSuggestions, setSchoolSuggestions] = useState([]);
+  const [suggestionsLength, setSuggestionsLength] = useState(0);
+  const [autoCompleteBackground, setListBackground] = useState("none");
+  useEffect(() => {
+    const getSuggestions = async () => {
+      const schoolSuggestions = await getSchoolSuggestions(school);
+      let responseLength = 0;
+      if (schoolSuggestions) {
+        const schoolList = schoolSuggestions.data;
+        interface ApiObject {
+          alpha_two_code: string | null;
+          country: string | null;
+          domains: string[] | null;
+          name: string | null;
+          "state-province": string | null;
+          web_pages: string[] | null;
+        }
+        //   console.log(schoolList);
+        setSuggestionsLength(schoolSuggestions.data.length);
+        const nameList = schoolSuggestions.data.map((x: ApiObject) => x.name);
+        setSchoolSuggestions(nameList);
+      }
+    };
+    const timeoutId = setTimeout(() => {
+      if (school == "" || !school.replace(/\s/g, "").length) {
+        console.log("set it to none");
+        setSchoolSuggestions([]);
+      } else {
+        getSuggestions();
+      }
+    }, 350);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+
+    //setSchoolSuggestions(schoolSuggestions);
+  }, [school]);
+
+  useEffect(() => {
+    console.log("in here because you just changed suggestions");
+    console.log(school);
+    console.log(schoolSuggestions);
+
+    if (schoolSuggestions.length == 0) {
+      console.log("schoolSuggestions length is 0", schoolSuggestions.length);
+      setListBackground("rgb(0, 0, 0,0)");
+    } else {
+      setListBackground("white");
+    }
+  }, [schoolSuggestions]);
 
   const openModal = () => {
     console.log("opening");
@@ -91,12 +143,17 @@ const MyModal = () => {
         setDescription(e.target.value);
         break;
     }
+    if (schoolSuggestions[0] != null) {
+      console.log("setting background");
+      setListBackground("white");
+    }
     console.log("just set");
   };
   return (
     <div>
       <CenteredButton onClick={openModal}>Add new education</CenteredButton>
       <Modal
+        ariaHideApp={false}
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Edu Modal"
@@ -115,6 +172,27 @@ const MyModal = () => {
               onChange={e => onTextChange(e, "school")}
               placeholder={"Ex: Boston University"}
             />
+            <div
+              style={{
+                position: "absolute",
+                zIndex: 2,
+                backgroundColor: autoCompleteBackground,
+
+                //border: autoCompleteBackground == "white" ? "solid" : "none",
+                borderRadius: "4px",
+                width: "calc(100% - 45px)",
+                boxShadow:
+                  autoCompleteBackground == "white"
+                    ? "0 6px 6px rgba(0, 0, 0, 0.2)"
+                    : "none",
+                borderWidth: "thin"
+              }}
+            >
+              <WindowList
+                names={schoolSuggestions}
+                length={suggestionsLength}
+              ></WindowList>
+            </div>
           </div>
           {/* //////////////////////////////////////// DATES DIV */}
           <div id="datesDiv" style={{ display: "flex", marginTop: "20px" }}>
