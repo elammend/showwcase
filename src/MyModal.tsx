@@ -24,7 +24,7 @@ const MyModal = () => {
   const [description, setDescription] = useState("");
   const [schoolSuggestions, setSchoolSuggestions] = useState([]);
   const [suggestionsLength, setSuggestionsLength] = useState(0);
-  const [autoCompleteBackground, setListBackground] = useState("none");
+  const [listDisplay, setListDisplay] = useState("none");
   useEffect(() => {
     const getSuggestions = async () => {
       const schoolSuggestions = await getSchoolSuggestions(school);
@@ -40,6 +40,11 @@ const MyModal = () => {
           web_pages: string[] | null;
         }
         //   console.log(schoolList);
+        if (schoolSuggestions.data.length == 0) {
+          setListDisplay("none");
+        } else {
+          setListDisplay("block");
+        }
         setSuggestionsLength(schoolSuggestions.data.length);
         const nameList = schoolSuggestions.data.map((x: ApiObject) => x.name);
         setSchoolSuggestions(nameList);
@@ -48,6 +53,7 @@ const MyModal = () => {
     const timeoutId = setTimeout(() => {
       if (school == "" || !school.replace(/\s/g, "").length) {
         console.log("set it to none");
+        setListDisplay("none");
         setSchoolSuggestions([]);
       } else {
         getSuggestions();
@@ -64,13 +70,12 @@ const MyModal = () => {
   useEffect(() => {
     console.log("in here because you just changed suggestions");
     console.log(school);
-    console.log(schoolSuggestions);
 
     if (schoolSuggestions.length == 0) {
       console.log("schoolSuggestions length is 0", schoolSuggestions.length);
-      setListBackground("rgb(0, 0, 0,0)");
+      setListDisplay("none");
     } else {
-      setListBackground("white");
+      setListDisplay("block");
     }
   }, [schoolSuggestions]);
 
@@ -143,10 +148,7 @@ const MyModal = () => {
         setDescription(e.target.value);
         break;
     }
-    if (schoolSuggestions[0] != null) {
-      console.log("setting background");
-      setListBackground("white");
-    }
+
     console.log("just set");
   };
   return (
@@ -168,6 +170,16 @@ const MyModal = () => {
               <div style={{ color: "red" }}>*</div>
             </div>
             <Input
+              onFocus={() => {
+                console.log("focused!");
+                if (suggestionsLength != 0) {
+                  setListDisplay("block");
+                }
+              }}
+              onBlur={() => {
+                console.log("not focused!");
+                setListDisplay("none");
+              }}
               value={school}
               onChange={e => onTextChange(e, "school")}
               placeholder={"Ex: Boston University"}
@@ -176,15 +188,13 @@ const MyModal = () => {
               style={{
                 position: "absolute",
                 zIndex: 2,
-                backgroundColor: autoCompleteBackground,
-
+                backgroundColor: "white",
+                display: listDisplay,
+                cursor: "pointer",
                 //border: autoCompleteBackground == "white" ? "solid" : "none",
                 borderRadius: "4px",
                 width: "calc(100% - 45px)",
-                boxShadow:
-                  autoCompleteBackground == "white"
-                    ? "0 6px 6px rgba(0, 0, 0, 0.2)"
-                    : "none",
+                boxShadow: "0 6px 6px rgba(0, 0, 0, 0.2)",
                 borderWidth: "thin"
               }}
             >
