@@ -9,11 +9,53 @@ import {
 } from "./MainStyles";
 import MyModal from "./MyModal";
 
+const isEmpty = (str: string): boolean => {
+  if (str == "" || !str.replace(/\s/g, "").length) {
+    return true;
+  }
+  return false;
+};
 type MainProps = {
   location: { state: { name: string } };
 };
 
+export interface EduProps {
+  school: string;
+  startDate: string;
+  endDate: string;
+  degree: string;
+  grade: string;
+  study: string;
+  description: string;
+}
+
+const Edu: React.FC<EduProps> = ({
+  school,
+  startDate,
+  endDate,
+  degree,
+  grade,
+  study,
+  description
+}) => {
+  return (
+    <EduDiv>
+      <h2>{school}</h2>
+      {
+        <h3>
+          {isEmpty(degree) ? null : degree} {isEmpty(study) ? null : study}{" "}
+          {isEmpty(grade) ? null : grade}
+        </h3>
+      }
+      <p>
+        {startDate} - {endDate}
+      </p>
+      <p>{description}</p>
+    </EduDiv>
+  );
+};
 const Main: React.FC<MainProps> = props => {
+  const [eduList, setEdu] = useState<EduProps[]>([]);
   useEffect(() => {
     console.log(props.location.state.name);
   });
@@ -22,44 +64,37 @@ const Main: React.FC<MainProps> = props => {
     <div>
       <CenteredBox>
         <div>Welcome to {props.location.state.name}'s education page! </div>
-        <MyModal></MyModal>
+        <MyModal eduList={eduList} setEdu={setEdu}></MyModal>
       </CenteredBox>
 
       <FlexContainer>
         <BookmarkBox>
+          {eduList.map((x: EduProps) => {
+            return (
+              <CenteredButton key={new Date().getTime() + Math.random()}>
+                {x.school}
+              </CenteredButton>
+            );
+          })}
           <CenteredButton>
             California Polytechnic State University: San Luis Obispo
           </CenteredButton>
         </BookmarkBox>
         <EduContainer>
-          <EduDiv>
-            <h2>Cal Poly SLO</h2>
-            <h3>B.S Software Engineering</h3>
-            <p>September 14, 2015 - December 2016</p>
-            <p>• bullet 1</p>
-            <p>• bullet 2</p>
-          </EduDiv>
-          <EduDiv>
-            <h2>Marshall Fundamental</h2>
-            <h3>B.S Software Engineering</h3>
-            <p>September 14, 1212412 - June 2015</p>
-            <p>• bullet 1</p>
-            <p>• bullet 2</p>
-          </EduDiv>
-          <EduDiv>
-            <h2>Marshall Fundamental</h2>
-            <h3>B.S Software Engineering</h3>
-            <p>September 14, 1212412 - June 2015</p>
-            <p>• bullet 1</p>
-            <p>• bullet 2</p>
-          </EduDiv>
-          <EduDiv>
-            <h2>Marshall Fundamental</h2>
-            <h3>B.S Software Engineering</h3>
-            <p>September 14, 1212412 - June 2015</p>
-            <p>• bullet 1</p>
-            <p>• bullet 2</p>
-          </EduDiv>
+          {eduList.map((x: EduProps) => {
+            return (
+              <Edu
+                key={new Date().getTime() + Math.random()}
+                school={x.school}
+                startDate={x.startDate}
+                endDate={x.endDate}
+                degree={x.degree}
+                grade={x.grade}
+                study={x.study}
+                description={x.description}
+              />
+            );
+          })}
         </EduContainer>
       </FlexContainer>
     </div>

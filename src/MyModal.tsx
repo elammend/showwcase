@@ -2,18 +2,15 @@ import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { RightButton, Input, InputBox, CenteredButton } from "./MainStyles";
 import { getSchoolSuggestions } from "./api/api";
+import { EduProps } from "./Main";
 import WindowList from "./WindowList";
-type EntryProps = {
-  label: string;
-  required: boolean;
-  customStyle: object;
-  boxInput: boolean;
-  placeholder: string;
-  inputType: string;
-  state: any;
-  stateSetter: (x: any) => void;
+
+type MyModalProps = {
+  eduList: EduProps[];
+  setEdu: (newList: EduProps[]) => void;
 };
-const MyModal = () => {
+
+const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [endDateDisabled, setEndDateDisabled] = useState(false);
   const [school, setSchool] = useState("");
@@ -25,6 +22,8 @@ const MyModal = () => {
   const [schoolSuggestions, setSchoolSuggestions] = useState([]);
   const [suggestionsLength, setSuggestionsLength] = useState(0);
   const [listDisplay, setListDisplay] = useState("none");
+  const [grade, setGrade] = useState("none");
+
   useEffect(() => {
     const getSuggestions = async () => {
       const schoolSuggestions = await getSchoolSuggestions(school);
@@ -109,6 +108,19 @@ const MyModal = () => {
       );
       return;
     }
+    // will reach here if successfully completed
+    const updatedList = eduList.concat({
+      school,
+      startDate,
+      endDate,
+      degree,
+      grade,
+      study,
+      description
+    });
+    setEdu(updatedList);
+    //reset modal here
+    setIsOpen(false);
   };
   const toggleEndDate = (e: React.ChangeEvent<HTMLInputElement>): void => {
     console.log(e.target.checked);
@@ -146,6 +158,9 @@ const MyModal = () => {
         break;
       case "description":
         setDescription(e.target.value);
+        break;
+      case "grade":
+        setGrade(e.target.value);
         break;
     }
 
@@ -251,15 +266,28 @@ const MyModal = () => {
               placeholder={"Ex: Bachelor's"}
             />
           </div>
-
-          {/* //////////////////////////////////////// STUDY DIV */}
-          <div id="studyDiv" style={{ marginTop: "20px" }}>
-            <div>Field of study</div>
-            <Input
-              value={study}
-              onChange={e => onTextChange(e, "study")}
-              placeholder={"Ex: Business"}
-            />
+          <div style={{ display: "flex" }}>
+            {/* //////////////////////////////////////// STUDY DIV */}
+            <div id="studyDiv" style={{ marginTop: "20px" }}>
+              <div>Field of study</div>
+              <Input
+                value={study}
+                onChange={e => onTextChange(e, "study")}
+                placeholder={"Ex: Business"}
+              />
+            </div>
+            {/* //////////////////////////////////////// STUDY DIV */}
+            <div
+              id="gradeDiv"
+              style={{ marginTop: "20px", marginLeft: "20px" }}
+            >
+              <div>Grade</div>
+              <Input
+                value={grade}
+                onChange={e => onTextChange(e, "grade")}
+                placeholder={"Ex: 3.0"}
+              />
+            </div>
           </div>
 
           {/* //////////////////////////////////////// DESCRIPTION DIV */}

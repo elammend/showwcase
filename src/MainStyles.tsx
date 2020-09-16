@@ -101,7 +101,7 @@ export const InputBox = styled.textarea`
   border: none;
   border-radius: 4px;
   margin: 5px 0;
-  height: 75px;
+  height: 100px;
   width: 100%;
   opacity: 0.85;
   display: inline-block;
