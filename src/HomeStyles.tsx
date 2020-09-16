@@ -1,0 +1,42 @@
+import styled from "styled-components";
+export const CenteredBox = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  height: 300px;
+  width: 500px;
+  transform: translate(-50%, -50%);
+  border-style: none;
+  text-align: center;
+  font-family: Arial;
+  font-size: 23px;
+`;
+export const CenteredButton = styled.button`
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  height: 40px;
+  width: 150px;
+  font-family: Arial;
+  font-size: 23px;
+  border: none;
+  background-color: #81bdda;
+  cursor: pointer;
+`;
+export const NameInput = styled.input`
+  width: 70%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  margin: 5px 0;
+  opacity: 0.85;
+  display: inline-block;
+  font-size: 17px;
+  line-height: 20px;
+  text-decoration: none;
+  box-sizing: border-box;
+  border-style: solid;
+  border-color: sky;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2);
+  border-width: thin;
+`;
