@@ -22,7 +22,6 @@ const WindowList: FC<WLProps> = ({
     <div
       className="WindowRow"
       onClick={() => {
-        console.log("clicked here");
         setSchool(names[index]);
         setListDisplay("none");
       }}

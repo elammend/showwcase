@@ -14,7 +14,7 @@ const Home: React.FC = () => {
 
     history.push({
       pathname: "/main",
-      state: { name: inputText }
+      state: { name: inputText.trim() }
     });
     setText("");
   };

@@ -45,7 +45,7 @@ export const CenteredButton = styled.button`
   margin-left: auto;
   margin-right: auto;
   padding: 10px;
-  margin-top: 30px;
+
   width: 150px;
   font-family: Arial;
   font-size: 15px;
@@ -100,6 +100,7 @@ export const Input = styled.input`
 
 export const InputBox = styled.textarea`
   width: 100%;
+  wrap: off;
   font-family: Arial;
   padding: 12px;
   border: none;

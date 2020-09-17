@@ -32,6 +32,21 @@ const MyModal: React.FC<MyModalProps> = ({
   const [listDisplay, setListDisplay] = useState("none");
   const [grade, setGrade] = useState("");
 
+  const resetAlreadySavedStates = (): void => {
+    if (editing && eduProps) {
+      setEndDateDisabled(false);
+      setSchool(eduProps.school);
+      setStartDate(eduProps.startDate);
+      setEndDate(eduProps.endDate);
+      setDegree(eduProps.degree);
+      setStudy(eduProps.study);
+      setDescription(eduProps.description);
+      //  setSchoolSuggestions([]);
+      setSuggestionsLength(0);
+      setListDisplay("none");
+      setGrade(eduProps.grade);
+    }
+  };
   const resetStates = (): void => {
     setEndDateDisabled(false);
     setSchool("");
@@ -46,19 +61,7 @@ const MyModal: React.FC<MyModalProps> = ({
     setGrade("");
   };
   useEffect(() => {
-    if (editing && eduProps) {
-      setEndDateDisabled(false);
-      setSchool(eduProps.school);
-      setStartDate(eduProps.startDate);
-      setEndDate(eduProps.endDate);
-      setDegree(eduProps.degree);
-      setStudy(eduProps.study);
-      setDescription(eduProps.description);
-      //  setSchoolSuggestions([]);
-      setSuggestionsLength(0);
-      setListDisplay("none");
-      setGrade(eduProps.grade);
-    }
+    resetAlreadySavedStates();
   }, []);
   useEffect(() => {
     const getSuggestions = async () => {
@@ -73,7 +76,6 @@ const MyModal: React.FC<MyModalProps> = ({
           "state-province": string | null;
           web_pages: string[] | null;
         }
-        //   console.log(schoolList);
         if (schoolSuggestions.data.length == 0) {
           setListDisplay("none");
         } else {
@@ -86,7 +88,6 @@ const MyModal: React.FC<MyModalProps> = ({
     };
     const timeoutId = setTimeout(() => {
       if (school == "" || !school.replace(/\s/g, "").length) {
-        console.log("set it to none");
         setListDisplay("none");
         setSchoolSuggestions([]);
       } else {
@@ -102,14 +103,10 @@ const MyModal: React.FC<MyModalProps> = ({
   }, [school]);
 
   useEffect(() => {
-    console.log("in here because you just changed suggestions");
-    console.log(school);
-
     if (
       schoolSuggestions.length == 0 ||
       (suggestionsLength == 1 && school == schoolSuggestions[0])
     ) {
-      console.log("schoolSuggestions length is 0", schoolSuggestions.length);
       setListDisplay("none");
     } else {
       setListDisplay("block");
@@ -117,17 +114,19 @@ const MyModal: React.FC<MyModalProps> = ({
   }, [schoolSuggestions]);
 
   const openModal = () => {
-    console.log("opening");
     setIsOpen(true);
   };
 
   const closeModal = () => {
-    resetStates();
+    if (editing) {
+      resetAlreadySavedStates();
+    } else {
+      resetStates();
+    }
     setIsOpen(false);
   };
 
   const saveEducation = () => {
-    console.log("clicked save!");
     let mustComplete = [];
 
     const isEmpty = (str: string): boolean => {
@@ -176,19 +175,19 @@ const MyModal: React.FC<MyModalProps> = ({
         study,
         description,
         boxId: new Date().getTime() + Math.random(),
-        bookMarkId: new Date().getTime() + Math.random(),
-        deleteFunc: null
+        bookMarkId: new Date().getTime() + Math.random()
       });
     }
+    updatedList.sort(
+      (a, b) =>
+        new Date(b.startDate).valueOf() - new Date(a.startDate).valueOf()
+    );
     setEdu(updatedList);
-    //reset modal here
-    resetStates();
-    setIsOpen(false);
+
+    closeModal();
   };
   const toggleEndDate = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    console.log(e.target.checked);
     const initialState = endDate;
-    console.log(initialState);
     if (e.target.checked) {
       setEndDate("present");
       setEndDateDisabled(true);
@@ -203,10 +202,8 @@ const MyModal: React.FC<MyModalProps> = ({
       | React.ChangeEvent<HTMLTextAreaElement>,
     stateName: string
   ): any => {
-    console.log("in here!");
     switch (stateName) {
       case "school":
-        console.log("hheeeere", e.target.value);
         setSchool(e.target.value);
         break;
       case "startDate":
@@ -228,8 +225,6 @@ const MyModal: React.FC<MyModalProps> = ({
         setGrade(e.target.value);
         break;
     }
-
-    console.log("just set");
   };
   return (
     <div
@@ -239,14 +234,17 @@ const MyModal: React.FC<MyModalProps> = ({
           (e.target as HTMLTextAreaElement).className != "WindowRow" &&
           (e.target as HTMLTextAreaElement).id != "schoolInput"
         ) {
-          console.log("should close suggestion window");
           if (listDisplay == "block") {
             setListDisplay("none");
           }
         }
       }}
     >
-      <CenteredButton onClick={openModal}>Add new education</CenteredButton>
+      <div style={{ marginTop: editing ? "0px" : "30px" }}>
+        <CenteredButton onClick={openModal}>
+          {editing ? "Edit" : "Add new education"}
+        </CenteredButton>
+      </div>
       <Modal
         ariaHideApp={false}
         isOpen={modalIsOpen}
@@ -259,7 +257,6 @@ const MyModal: React.FC<MyModalProps> = ({
           {/* //////////////////////////////////////// SCHOOL DIV */}
           <div
             onFocus={() => {
-              console.log("focused!");
               if (suggestionsLength != 0) {
                 setListDisplay("block");
               }

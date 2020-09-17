@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, createRef } from "react";
 
 import {
   CenteredBox,
@@ -31,19 +31,36 @@ export interface EduProps {
   description: string;
   boxId: number | null;
   bookMarkId: number | null;
-  deleteFunc: ((itemToDelete: number | null) => void) | null;
 }
 
 export interface ListProps {
   itemId: number | null;
 }
+interface refObject {
+  [key: string]: any;
+}
 
 const Main: React.FC<MainProps> = props => {
   const [eduList, setEdu] = useState<EduProps[]>([]);
-  useEffect(() => {
-    console.log(props.location.state.name);
-  });
+  const refsObject: refObject = {};
 
+  const createRefByKey = (key: number | null) => {
+    if (!key) {
+      console.error("given key is null");
+      return;
+    }
+    if (refsObject[key] == null) {
+      //create ref
+      refsObject[key] = createRef();
+    }
+  };
+  const getRefByKey = (key: number | null) => {
+    if (key == null) {
+      console.error("key is null");
+      return;
+    }
+    return refsObject[key];
+  };
   const handleDelete = (itemToDelete: number | null) => {
     const newList = eduList.filter(item => item.boxId !== itemToDelete);
 
@@ -57,17 +74,8 @@ const Main: React.FC<MainProps> = props => {
     grade,
     study,
     description,
-    boxId,
-    deleteFunc
+    boxId
   }) => {
-    const deleteDivs = (
-      e: React.MouseEvent<HTMLElement>,
-      boxId: number | null
-    ) => {
-      if (e.target) {
-        console.log(boxId);
-      }
-    };
     return (
       <EduDiv>
         <h2>{school}</h2>
@@ -83,39 +91,45 @@ const Main: React.FC<MainProps> = props => {
         <div style={{ display: "flex" }}>
           <p>{description}</p>
           <div style={{ width: "100%", float: "right" }}>
-            <RightButton style={{ border: "solid" }}>Edit</RightButton>
             <RightButton
-              style={{ marginTop: "15px", border: "solid" }}
+              style={{ marginTop: "15px", border: "solid", width: "150px" }}
               onClick={() => {
-                deleteFunc ? deleteFunc(boxId) : console.error("delete failed");
+                handleDelete(boxId);
               }}
             >
               Delete
             </RightButton>
-            <MyModal
-              eduList={eduList}
-              setEdu={setEdu}
-              editing={true}
-              eduProps={{
-                school,
-                startDate,
-                endDate,
-                degree,
-                grade,
-                study,
-                description,
-                boxId,
-                bookMarkId: null,
-                deleteFunc
-              }}
-              elementBeingEdited={null}
-            ></MyModal>
+            <div style={{ border: "solid", float: "right", marginTop: "15px" }}>
+              <MyModal
+                eduList={eduList}
+                setEdu={setEdu}
+                editing={true}
+                eduProps={{
+                  school,
+                  startDate,
+                  endDate,
+                  degree,
+                  grade,
+                  study,
+                  description,
+                  boxId,
+                  bookMarkId: null
+                }}
+                elementBeingEdited={null}
+              ></MyModal>
+            </div>
           </div>
         </div>
       </EduDiv>
     );
   };
 
+  const scrollTo = (key: number | null) => {
+    if (key == null) {
+      return;
+    }
+    refsObject[key].current.scrollIntoView();
+  };
   return (
     <div>
       <CenteredBox>
@@ -132,27 +146,37 @@ const Main: React.FC<MainProps> = props => {
       <FlexContainer>
         <BookmarkBox>
           {eduList.map((x: EduProps) => {
+            createRefByKey(x.boxId);
             return (
-              <CenteredButton key={x.bookMarkId}>{x.school}</CenteredButton>
+              <div key={x.bookMarkId} style={{ margin: "20px" }}>
+                <CenteredButton
+                  onClick={() => {
+                    scrollTo(x.boxId);
+                  }}
+                >
+                  {x.school}
+                </CenteredButton>
+              </div>
             );
           })}
         </BookmarkBox>
+
         <EduContainer>
           {eduList.map((x: EduProps) => {
             return (
-              <Edu
-                key={x.boxId}
-                school={x.school}
-                startDate={x.startDate}
-                endDate={x.endDate}
-                degree={x.degree}
-                grade={x.grade}
-                study={x.study}
-                description={x.description}
-                boxId={x.boxId}
-                bookMarkId={x.bookMarkId}
-                deleteFunc={handleDelete}
-              />
+              <div ref={getRefByKey(x.boxId)} key={x.boxId}>
+                <Edu
+                  school={x.school}
+                  startDate={x.startDate}
+                  endDate={x.endDate}
+                  degree={x.degree}
+                  grade={x.grade}
+                  study={x.study}
+                  description={x.description}
+                  boxId={x.boxId}
+                  bookMarkId={x.bookMarkId}
+                />
+              </div>
             );
           })}
         </EduContainer>
