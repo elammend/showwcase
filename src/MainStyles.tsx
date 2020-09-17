@@ -68,6 +68,7 @@ export const RightButton = styled.button.attrs((props: ListProps) => ({
   cursor: pointer;
 `;
 export const EduDiv = styled.div`
+  height: auto;
   margin-left: 20px;
   margin-right: 80px;
   padding: 10px;
