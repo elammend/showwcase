@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { ListProps } from "./Main";
 export const CenteredBox = styled.div`
   position: relative;
   top: 20px;
@@ -52,7 +53,10 @@ export const CenteredButton = styled.button`
   background-color: #81bdda;
   cursor: pointer;
 `;
-export const RightButton = styled.button`
+export const RightButton = styled.button.attrs((props: ListProps) => ({
+  // we can define static props
+  itemId: props.itemId
+}))`
   float: right;
   margin-left: 10px;
   padding: 10px;

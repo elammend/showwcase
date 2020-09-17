@@ -37,10 +37,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
     setListDisplay("none");
     setGrade("");
   };
+
   useEffect(() => {
     const getSuggestions = async () => {
       const schoolSuggestions = await getSchoolSuggestions(school);
-      let responseLength = 0;
       if (schoolSuggestions) {
         const schoolList = schoolSuggestions.data;
         interface ApiObject {
@@ -100,6 +100,7 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
   };
 
   const closeModal = () => {
+    resetStates();
     setIsOpen(false);
   };
 
@@ -132,7 +133,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
       degree,
       grade,
       study,
-      description
+      description,
+      boxId: new Date().getTime() + Math.random(),
+      bookMarkId: new Date().getTime() + Math.random(),
+      deleteFunc: null
     });
     setEdu(updatedList);
     //reset modal here
@@ -222,6 +226,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
               <div style={{ color: "red" }}>*</div>
             </div>
             <Input
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               id="schoolInput"
               value={school}
               onChange={e => onTextChange(e, "school")}
@@ -257,6 +265,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
                 <div style={{ color: "red" }}>*</div>
               </div>
               <Input
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
                 value={startDate}
                 onChange={e => onTextChange(e, "startDate")}
                 type="month"
@@ -271,6 +283,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
                 <div style={{ color: "red" }}>*</div>
               </div>
               <Input
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
                 value={endDate}
                 disabled={endDateDisabled}
                 onChange={e => onTextChange(e, "endDate")}
@@ -281,6 +297,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
             <div style={{ marginLeft: "20px", marginTop: "0px" }}>
               <div>present</div>
               <input
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
                 type="checkbox"
                 onChange={toggleEndDate}
                 style={{ cursor: "pointer", width: "35px", height: "35px" }}
@@ -291,6 +311,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
           <div id="degreeDiv" style={{ marginTop: "20px" }}>
             <div>Degree</div>
             <Input
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               value={degree}
               onChange={e => onTextChange(e, "degree")}
               placeholder={"Ex: Bachelor's"}
@@ -301,6 +325,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
             <div id="studyDiv" style={{ marginTop: "20px" }}>
               <div>Field of study</div>
               <Input
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
                 value={study}
                 onChange={e => onTextChange(e, "study")}
                 placeholder={"Ex: Business"}
@@ -313,6 +341,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
             >
               <div>Grade</div>
               <Input
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
                 value={grade}
                 onChange={e => onTextChange(e, "grade")}
                 placeholder={"Ex: 3.0"}
@@ -327,6 +359,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
               <div style={{ color: "red" }}>*</div>
             </div>
             <InputBox
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               value={description}
               onChange={e => onTextChange(e, "description")}
             />

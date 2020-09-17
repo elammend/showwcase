@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+
 import {
   CenteredBox,
   BookmarkBox,
   CenteredButton,
   FlexContainer,
   EduContainer,
-  EduDiv
+  EduDiv,
+  RightButton
 } from "./MainStyles";
 import MyModal from "./MyModal";
 
@@ -27,6 +29,13 @@ export interface EduProps {
   grade: string;
   study: string;
   description: string;
+  boxId: number | null;
+  bookMarkId: number | null;
+  deleteFunc: ((itemToDelete: number | null) => void) | null;
+}
+
+export interface ListProps {
+  itemId: number | null;
 }
 
 const Edu: React.FC<EduProps> = ({
@@ -36,8 +45,18 @@ const Edu: React.FC<EduProps> = ({
   degree,
   grade,
   study,
-  description
+  description,
+  boxId,
+  deleteFunc
 }) => {
+  const deleteDivs = (
+    e: React.MouseEvent<HTMLElement>,
+    boxId: number | null
+  ) => {
+    if (e.target) {
+      console.log(boxId);
+    }
+  };
   return (
     <EduDiv>
       <h2>{school}</h2>
@@ -50,7 +69,20 @@ const Edu: React.FC<EduProps> = ({
       <p>
         {startDate} - {endDate}
       </p>
-      <p>{description}</p>
+      <div style={{ display: "flex" }}>
+        <p>{description}</p>
+        <div style={{ width: "100%", float: "right" }}>
+          <RightButton style={{ border: "solid" }}>Edit</RightButton>
+          <RightButton
+            style={{ marginTop: "15px", border: "solid" }}
+            onClick={() => {
+              deleteFunc ? deleteFunc(boxId) : console.error("delete failed");
+            }}
+          >
+            Delete
+          </RightButton>
+        </div>
+      </div>
     </EduDiv>
   );
 };
@@ -60,6 +92,11 @@ const Main: React.FC<MainProps> = props => {
     console.log(props.location.state.name);
   });
 
+  const handleDelete = (itemToDelete: number | null) => {
+    const newList = eduList.filter(item => item.boxId !== itemToDelete);
+
+    setEdu(newList);
+  };
   return (
     <div>
       <CenteredBox>
@@ -71,9 +108,7 @@ const Main: React.FC<MainProps> = props => {
         <BookmarkBox>
           {eduList.map((x: EduProps) => {
             return (
-              <CenteredButton key={new Date().getTime() + Math.random()}>
-                {x.school}
-              </CenteredButton>
+              <CenteredButton key={x.bookMarkId}>{x.school}</CenteredButton>
             );
           })}
         </BookmarkBox>
@@ -81,7 +116,7 @@ const Main: React.FC<MainProps> = props => {
           {eduList.map((x: EduProps) => {
             return (
               <Edu
-                key={new Date().getTime() + Math.random()}
+                key={x.boxId}
                 school={x.school}
                 startDate={x.startDate}
                 endDate={x.endDate}
@@ -89,6 +124,9 @@ const Main: React.FC<MainProps> = props => {
                 grade={x.grade}
                 study={x.study}
                 description={x.description}
+                boxId={x.boxId}
+                bookMarkId={x.bookMarkId}
+                deleteFunc={handleDelete}
               />
             );
           })}

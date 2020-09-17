@@ -46,6 +46,10 @@ const Home: React.FC = () => {
           Type your name and click "Enter" below to begin!
         </div>
         <NameInput
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
           value={inputText}
           onChange={onTextChange}
           onKeyDown={handleKeyPress}
