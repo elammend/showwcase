@@ -8,9 +8,17 @@ import WindowList from "./WindowList";
 type MyModalProps = {
   eduList: EduProps[];
   setEdu: (newList: EduProps[]) => void;
+  eduProps: EduProps | null;
+  editing: boolean;
+  elementBeingEdited: number | null;
 };
 
-const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
+const MyModal: React.FC<MyModalProps> = ({
+  eduList,
+  setEdu,
+  eduProps,
+  editing
+}) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [endDateDisabled, setEndDateDisabled] = useState(false);
   const [school, setSchool] = useState("");
@@ -37,7 +45,21 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
     setListDisplay("none");
     setGrade("");
   };
-
+  useEffect(() => {
+    if (editing && eduProps) {
+      setEndDateDisabled(false);
+      setSchool(eduProps.school);
+      setStartDate(eduProps.startDate);
+      setEndDate(eduProps.endDate);
+      setDegree(eduProps.degree);
+      setStudy(eduProps.study);
+      setDescription(eduProps.description);
+      //  setSchoolSuggestions([]);
+      setSuggestionsLength(0);
+      setListDisplay("none");
+      setGrade(eduProps.grade);
+    }
+  }, []);
   useEffect(() => {
     const getSuggestions = async () => {
       const schoolSuggestions = await getSchoolSuggestions(school);
@@ -107,12 +129,14 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
   const saveEducation = () => {
     console.log("clicked save!");
     let mustComplete = [];
+
     const isEmpty = (str: string): boolean => {
       if (str == "" || !str.replace(/\s/g, "").length) {
         return true;
       }
       return false;
     };
+
     if (isEmpty(school)) mustComplete.push("school");
     if (isEmpty(startDate)) mustComplete.push("start date");
     if (isEmpty(endDate)) mustComplete.push("end date");
@@ -126,18 +150,36 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
       return;
     }
     // will reach here if successfully completed
-    const updatedList = eduList.concat({
-      school,
-      startDate,
-      endDate,
-      degree,
-      grade,
-      study,
-      description,
-      boxId: new Date().getTime() + Math.random(),
-      bookMarkId: new Date().getTime() + Math.random(),
-      deleteFunc: null
-    });
+    let updatedList: EduProps[] = [];
+    if (editing && eduProps != null) {
+      updatedList = eduList.map(element => {
+        if (element.boxId == eduProps.boxId) {
+          const updatedItem = { ...element };
+          updatedItem.school = school;
+          updatedItem.startDate = startDate;
+          updatedItem.endDate = endDate;
+          updatedItem.degree = degree;
+          updatedItem.grade = grade;
+          updatedItem.study = study;
+          updatedItem.description = description;
+          return updatedItem;
+        }
+        return element;
+      });
+    } else {
+      updatedList = eduList.concat({
+        school,
+        startDate,
+        endDate,
+        degree,
+        grade,
+        study,
+        description,
+        boxId: new Date().getTime() + Math.random(),
+        bookMarkId: new Date().getTime() + Math.random(),
+        deleteFunc: null
+      });
+    }
     setEdu(updatedList);
     //reset modal here
     resetStates();
@@ -161,8 +203,10 @@ const MyModal: React.FC<MyModalProps> = ({ eduList, setEdu }) => {
       | React.ChangeEvent<HTMLTextAreaElement>,
     stateName: string
   ): any => {
+    console.log("in here!");
     switch (stateName) {
       case "school":
+        console.log("hheeeere", e.target.value);
         setSchool(e.target.value);
         break;
       case "startDate":
