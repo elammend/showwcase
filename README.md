@@ -1,6 +1,6 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-[![Alt text](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=e85qwVCPuug&feature=youtu.be)
+[![Alt text](https://i9.ytimg.com/vi_webp/e85qwVCPuug/mqdefault.webp?sqp=COiEjPsF&rs=AOn4CLDvnvdgHaq-UqMpDw_iUzBWOj0u5w)](https://www.youtube.com/watch?v=e85qwVCPuug&feature=youtu.be)
 ## Available Scripts
 
 In the project directory, you can run:
